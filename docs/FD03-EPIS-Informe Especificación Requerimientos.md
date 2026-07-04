@@ -68,18 +68,21 @@ El equipo desarrolla una solución centralizada de auditoría. Mediante un panel
 ### A. Requerimientos Funcionales Finales
 | Código | Requerimiento | Descripción | Prioridad |
 | :--- | :--- | :--- | :--- |
-| **RF01** | Conexión a BD | Establecer conexión a PostgreSQL y manejar errores de timeout. | Alta |
-| **RF02** | Carga de CSV | Importar, leer y visualizar archivos como `reporte_auditar_prueba.csv`. | Alta |
-| **RF03** | Monitoreo Vivo | Refrescar automáticamente bajo demanda los registros de la tabla log. | Alta |
-| **RF04** | Filtrado Dinámico | Aplicar filtros a los DataFrames de Pandas para refinar las búsquedas. | Alta |
-| **RF05** | Gen. Rollbacks | Generar dinámicamente scripts SQL para revertir operaciones específicas basadas en el registro de auditoría. | Alta |
+| **RF01** | Autenticación SaaS | Gestión de acceso seguro mediante registro de usuarios, roles (Admin/Cliente) almacenados en una BD local (`saas_admin.db`). | Alta |
+| **RF02** | Conexión Multi-Motor | Establecer conexión dinámica y guardar perfiles para PostgreSQL, MySQL, SQLite y MongoDB. | Alta |
+| **RF03** | Monitoreo Vivo | Refrescar automáticamente bajo demanda los registros de operaciones y transacciones de la BD conectada. | Alta |
+| **RF04** | Gen. Rollbacks | Generar dinámicamente scripts o comandos para revertir operaciones específicas basadas en el registro de auditoría. | Alta |
+| **RF05** | Carga de CSV | Importar, leer y visualizar archivos de reportes históricos de auditoría en formato CSV mediante Pandas. | Media |
+| **RF06** | Filtrado Dinámico | Aplicar filtros a las tablas de monitoreo (usuario, operación, fechas) para refinar las búsquedas. | Alta |
+| **RF07** | API REST (Skill) | Exponer el núcleo de auditoría a través de una API REST pública para ser consumida por otros microservicios, agentes o bots. | Media |
 
 ### B. Requerimientos No Funcionales
 | Código | Requerimiento | Descripción | Prioridad |
 | :--- | :--- | :--- | :--- |
-| **RNF01** | Rendimiento | El procesamiento y renderizado de un archivo CSV con más de 10,000 registros debe tomar menos de 3 segundos usando Pandas. | Alta |
-| **RNF02** | Usabilidad | La interfaz debe ser intuitiva, con navegación en barra lateral (Sidebar) nativa de Streamlit. | Alta |
-| **RNF03** | Seguridad | Las credenciales de acceso a la base de datos no deben estar codificadas en texto plano (uso de secretos/variables de entorno). | Alta |
+| **RNF01** | Rendimiento | El procesamiento y renderizado de un archivo CSV con miles de registros debe ser ágil usando Pandas. | Alta |
+| **RNF02** | Usabilidad | La interfaz debe ser intuitiva, moderna y multi-usuario, utilizando el esquema nativo de páginas de Streamlit. | Alta |
+| **RNF03** | Seguridad | Las contraseñas de los usuarios deben almacenarse cifradas (SHA-256) y las credenciales de BD no deben exponerse en texto plano. | Alta |
+| **RNF04** | Integración Continua (CI/CD) | El proyecto debe contar con flujos automatizados (GitHub Actions) para análisis estático, pruebas (unitarias, integración, BDD), versionamiento y despliegue de reportes. | Alta |
 
 ---
 
@@ -226,6 +229,6 @@ El equipo desarrolla una solución centralizada de auditoría. Mediante un panel
 *   **Capacidad de Respuesta:** La generación automatizada de *rollbacks* convierte al sistema en un recurso activo para la rápida recuperación de desastres.
 
 ### Recomendaciones
-*   **Alertas:** Desarrollar integraciones para envíos automáticos de alertas (webhooks a Slack/Teams) ante operaciones críticas masivas.
-*   **Soporte Multi-Motor:** Refactorizar la capa de persistencia para soportar motores como SQL Server, MySQL u Oracle.
+*   **Alertas:** Desarrollar integraciones para envíos automáticos de alertas (webhooks a Slack/Teams) ante operaciones críticas masivas detectadas vía la API REST.
+*   **Soporte de Nuevos Motores:** Ampliar el soporte multi-motor ya implementado para incluir sistemas empresariales adicionales como Oracle o SQL Server.
 *   **Análisis Avanzado:** Incorporar módulos para analizar patrones anómalos de comportamiento y exportar evidencias en formatos inmutables como PDF.
