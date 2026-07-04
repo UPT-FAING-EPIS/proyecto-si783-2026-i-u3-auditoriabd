@@ -1,0 +1,135 @@
+name: Deploy Test Reports to GitHub Pages
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy-reports:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+          cache: 'pip'
+          
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+          # Instalar herramientas de reportes
+          pip install pytest pytest-cov pytest-html behave behave-html-formatter pytest-playwright
+          playwright install --with-deps
+
+      - name: Create public directory
+        run: mkdir -p public
+
+      - name: Run Unit Tests and Generate HTML
+        run: |
+          if [ -d "tests/unit" ]; then
+            pytest tests/unit/ --cov=./ --cov-report=html:public/coverage --html=public/unit-tests.html --self-contained-html
+          else
+            echo "<p>No unit tests found.</p>" > public/unit-tests.html
+          fi
+        continue-on-error: true
+
+      - name: Run Integration Tests and Generate HTML
+        run: |
+          if [ -d "tests/integration" ]; then
+            pytest tests/integration/ --html=public/integration-tests.html --self-contained-html
+          else
+            echo "<p>No integration tests found.</p>" > public/integration-tests.html
+          fi
+        continue-on-error: true
+
+      - name: Run Interface Tests and Generate HTML
+        run: |
+          if [ -d "tests/interface" ]; then
+            pytest tests/interface/ --html=public/interface-tests.html --self-contained-html
+          else
+            echo "<p>No interface tests found.</p>" > public/interface-tests.html
+          fi
+        continue-on-error: true
+
+      - name: Run BDD Tests and Generate HTML
+        run: |
+          if [ -d "features" ]; then
+            behave -f html -o public/bdd-tests.html
+          else
+            echo "<p>No BDD tests found.</p>" > public/bdd-tests.html
+          fi
+        continue-on-error: true
+
+      - name: Generate Dashboard Index HTML
+        run: |
+          # Obtener el nombre del repositorio (usuario/repo) para los badges
+          REPO_NAME=${{ github.repository }}
+          
+          cat << EOF > public/index.html
+          <!DOCTYPE html>
+          <html lang="es">
+          <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Dashboard de Pruebas y Actions</title>
+            <style>
+              body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; background-color: #f0f2f5; color: #333; }
+              header { background-color: #24292e; color: white; padding: 20px; text-align: center; }
+              .container { max-width: 900px; margin: 40px auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+              h2 { border-bottom: 2px solid #eee; padding-bottom: 10px; color: #2c3e50; }
+              .badges { display: flex; flex-direction: column; gap: 15px; margin-bottom: 30px; }
+              .badge-item { display: flex; align-items: center; justify-content: space-between; background: #f8f9fa; padding: 15px; border-radius: 6px; border-left: 5px solid #0366d6; }
+              .badge-item span { font-weight: bold; }
+              ul.reports { list-style-type: none; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+              ul.reports li a { display: block; padding: 20px; background: #e1f0fa; color: #0366d6; text-decoration: none; border-radius: 6px; font-weight: bold; text-align: center; transition: background 0.3s; }
+              ul.reports li a:hover { background: #cce5ff; }
+            </style>
+          </head>
+          <body>
+            <header>
+              <h1>Resultados de Pruebas y GitHub Actions</h1>
+              <p>Repositorio: \$REPO_NAME</p>
+            </header>
+            <div class="container">
+              <h2>Estado de los Workflows</h2>
+              <div class="badges">
+                <div class="badge-item">
+                  <span>Análisis Estático (SonarCloud, Semgrep, Snyk)</span>
+                  <img src="https://github.com/\$REPO_NAME/actions/workflows/static-analysis.yml/badge.svg" alt="Static Analysis">
+                </div>
+                <div class="badge-item">
+                  <span>Pruebas (Unitarias, Integración, UI, BDD)</span>
+                  <img src="https://github.com/\$REPO_NAME/actions/workflows/testing.yml/badge.svg" alt="Testing">
+                </div>
+                <div class="badge-item">
+                  <span>Versionamiento y Release</span>
+                  <img src="https://github.com/\$REPO_NAME/actions/workflows/versioning.yml/badge.svg" alt="Versioning">
+                </div>
+              </div>
+
+              <h2>Reportes Detallados Generados</h2>
+              <ul class="reports">
+                <li><a href="unit-tests.html">📊 Reporte de Pruebas Unitarias</a></li>
+                <li><a href="coverage/index.html">📈 Reporte de Cobertura (Coverage)</a></li>
+                <li><a href="integration-tests.html">🔗 Reporte de Pruebas de Integración</a></li>
+                <li><a href="interface-tests.html">🖼️ Reporte de Pruebas de Interfaz</a></li>
+                <li><a href="bdd-tests.html">📝 Reporte de Pruebas BDD</a></li>
+              </ul>
+            </div>
+          </body>
+          </html>
+          EOF
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./public
+          keep_files: true
