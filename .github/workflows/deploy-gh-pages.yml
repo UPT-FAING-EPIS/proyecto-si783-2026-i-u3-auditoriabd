@@ -33,16 +33,16 @@ jobs:
 
       - name: Run Unit Tests and Generate HTML
         run: |
-          mkdir -p public/coverage
+          mkdir -p public/coverage-report
           if [ -d "tests/unit" ]; then
-            pytest tests/unit/ --cov=./ --cov-report=html:public/coverage --html=public/unit-tests.html --self-contained-html || true
+            pytest tests/unit/ --cov=app --cov-report=html:public/coverage-report --html=public/unit-tests.html --self-contained-html || true
           else
             echo "<p>No unit tests found.</p>" > public/unit-tests.html
-            echo "<p>No coverage generated because there are no tests.</p>" > public/coverage/index.html
+            echo "<p>No coverage generated because there are no tests.</p>" > public/coverage-report/index.html
           fi
           # Fallback if pytest failed to create the coverage index
-          if [ ! -f "public/coverage/index.html" ]; then
-            echo "<p>Coverage report could not be generated (tests may have failed before coverage was calculated).</p>" > public/coverage/index.html
+          if [ ! -f "public/coverage-report/index.html" ]; then
+            echo "<p>Coverage report could not be generated (tests may have failed before coverage was calculated).</p>" > public/coverage-report/index.html
           fi
         continue-on-error: true
 
@@ -127,7 +127,7 @@ jobs:
               <h2>Reportes Detallados Generados</h2>
               <ul class="reports">
                 <li><a href="unit-tests.html">📊 Reporte de Pruebas Unitarias</a></li>
-                <li><a href="coverage/index.html">📈 Reporte de Cobertura (Coverage)</a></li>
+                <li><a href="coverage-report/index.html">📈 Reporte de Cobertura (Coverage)</a></li>
                 <li><a href="integration-tests.html">🔗 Reporte de Pruebas de Integración</a></li>
                 <li><a href="interface-tests.html">🖼️ Reporte de Pruebas de Interfaz</a></li>
                 <li><a href="bdd-tests.html">📝 Reporte de Pruebas BDD</a></li>
