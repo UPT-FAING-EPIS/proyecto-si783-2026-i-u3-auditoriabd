@@ -13,6 +13,12 @@
 
 > **Panel de Auditoría de Base de Datos** es una solución interactiva y multi-usuario que permite el monitoreo en vivo de transacciones y la auditoría detallada de bases de datos relacionales y no relacionales (**PostgreSQL, MySQL, SQLite y MongoDB**). Diseñado con una interfaz web ágil y moderna, incorpora la inyección automatizada de triggers y change streams, la generación de scripts de reversión (rollbacks), almacenamiento de perfiles de conexión seguros y el análisis histórico mediante archivos CSV. Desarrollado como proyecto académico para la Escuela Profesional de Ingeniería de Sistemas de la Universidad Privada de Tacna.
 
+## 🎥 Video Explicación Aplicativo
+🔗 [https://youtu.be/U-SwXLzOVbg](https://youtu.be/U-SwXLzOVbg)
+
+## 🎓 Videos de uso de la aplicación por estudiantes de EPIS
+🔗 [https://drive.google.com/drive/folders/1Y4UYORicg9L5vAFNmTHkWhV5LRm_XP5q?usp=sharing](https://drive.google.com/drive/folders/1Y4UYORicg9L5vAFNmTHkWhV5LRm_XP5q?usp=sharing)
+
 ---
 
 ## Descripción
