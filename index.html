@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard de Pruebas y Actions</title>
+  <style>
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; background-color: #f0f2f5; color: #333; }
+    header { background-color: #24292e; color: white; padding: 20px; text-align: center; }
+    .container { max-width: 900px; margin: 40px auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+    h2 { border-bottom: 2px solid #eee; padding-bottom: 10px; color: #2c3e50; }
+    .badges { display: flex; flex-direction: column; gap: 15px; margin-bottom: 30px; }
+    .badge-item { display: flex; align-items: center; justify-content: space-between; background: #f8f9fa; padding: 15px; border-radius: 6px; border-left: 5px solid #0366d6; }
+    .badge-item span { font-weight: bold; }
+    ul.reports { list-style-type: none; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+    ul.reports li a { display: block; padding: 20px; background: #e1f0fa; color: #0366d6; text-decoration: none; border-radius: 6px; font-weight: bold; text-align: center; transition: background 0.3s; }
+    ul.reports li a:hover { background: #cce5ff; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Resultados de Pruebas y GitHub Actions</h1>
+    <p>Repositorio: $REPO_NAME</p>
+  </header>
+  <div class="container">
+    <h2>Estado de los Workflows</h2>
+    <div class="badges">
+      <div class="badge-item">
+        <span>Análisis Estático (SonarCloud, Semgrep, Snyk)</span>
+        <img src="https://github.com/$REPO_NAME/actions/workflows/static-analysis.yml/badge.svg" alt="Static Analysis">
+      </div>
+      <div class="badge-item">
+        <span>Pruebas (Unitarias, Integración, UI, BDD)</span>
+        <img src="https://github.com/$REPO_NAME/actions/workflows/testing.yml/badge.svg" alt="Testing">
+      </div>
+      <div class="badge-item">
+        <span>Versionamiento y Release</span>
+        <img src="https://github.com/$REPO_NAME/actions/workflows/versioning.yml/badge.svg" alt="Versioning">
+      </div>
+    </div>
+
+    <h2>Reportes Detallados Generados</h2>
+    <ul class="reports">
+      <li><a href="unit-tests.html">📊 Reporte de Pruebas Unitarias</a></li>
+      <li><a href="coverage/index.html">📈 Reporte de Cobertura (Coverage)</a></li>
+      <li><a href="integration-tests.html">🔗 Reporte de Pruebas de Integración</a></li>
+      <li><a href="interface-tests.html">🖼️ Reporte de Pruebas de Interfaz</a></li>
+      <li><a href="bdd-tests.html">📝 Reporte de Pruebas BDD</a></li>
+    </ul>
+  </div>
+</body>
+</html>
