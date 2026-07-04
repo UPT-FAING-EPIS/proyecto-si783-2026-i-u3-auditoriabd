@@ -78,9 +78,12 @@ def get_db_connection(engine: str, conn_details: Optional[ConnectionDetails] = N
             conn.row_factory = sqlite3.Row
             return conn
         elif engine.lower() == "mongodb":
-            uri = f"mongodb://{conn_details.user}:{conn_details.password}@{conn_details.host}:{conn_details.port or 27017}/"
-            if not conn_details.user:
-                uri = f"mongodb://{conn_details.host}:{conn_details.port or 27017}/"
+            if conn_details.host and conn_details.host.startswith(("mongodb://", "mongodb+srv://")):
+                uri = conn_details.host
+            else:
+                uri = f"mongodb://{conn_details.user}:{conn_details.password}@{conn_details.host}:{conn_details.port or 27017}/"
+                if not conn_details.user:
+                    uri = f"mongodb://{conn_details.host}:{conn_details.port or 27017}/"
             client = MongoClient(uri)
             return client[conn_details.database]
         else:
@@ -110,16 +113,42 @@ def configure_connection(req: ConnectionRequest):
     }
 
 @app.get("/api/v1/logs")
-def get_logs(engine: str = "postgresql", operation: Optional[str] = None, limit: int = 50):
+def get_logs(
+    engine: str = "postgresql", 
+    operation: Optional[str] = None, 
+    limit: int = 50,
+    host: Optional[str] = None,
+    port: Optional[int] = None,
+    user: Optional[str] = None,
+    password: Optional[str] = None,
+    database: Optional[str] = None
+):
     try:
-        conn = get_db_connection(engine)
+        if host or database:
+            conn_details = ConnectionDetails(
+                host=host or "localhost",
+                port=port,
+                user=user,
+                password=password,
+                database=database or ""
+            )
+        else:
+            conn_details = None
+            
+        conn = get_db_connection(engine, conn_details)
         logs = []
+        
+        # Mapear operacion de la API a la BD
+        db_operation = None
+        if operation:
+            op_map = {"INSERT": "I", "UPDATE": "U", "DELETE": "D"}
+            db_operation = op_map.get(operation.upper(), operation)
         
         if engine.lower() == "mongodb":
             col = conn["AUDITORIA_LOGS"]
             query = {}
-            if operation:
-                query["operacion"] = operation
+            if db_operation:
+                query["operacion"] = db_operation
             cursor = col.find(query).sort("fecha_hora", -1).limit(limit)
             for doc in cursor:
                 doc["id"] = str(doc.pop("_id", ""))
@@ -128,9 +157,9 @@ def get_logs(engine: str = "postgresql", operation: Optional[str] = None, limit:
             cursor = conn.cursor()
             query = "SELECT * FROM AUDITORIA_LOGS"
             params = []
-            if operation:
+            if db_operation:
                 query += " WHERE operacion = %s" if engine.lower() != "sqlite" else " WHERE operacion = ?"
-                params.append(operation)
+                params.append(db_operation)
             
             query += " ORDER BY fecha_hora DESC LIMIT %s" if engine.lower() != "sqlite" else " ORDER BY fecha_hora DESC LIMIT ?"
             params.append(limit)
@@ -151,9 +180,26 @@ def get_logs(engine: str = "postgresql", operation: Optional[str] = None, limit:
                 logs = cursor.fetchall() # Ya es un dict por el DictCursor
                 
             cursor.close()
-            conn.close()
+            if engine.lower() != "mongodb":
+                conn.close()
             
-        return {"success": True, "count": len(logs), "logs": logs}
+        # Estandarizar la respuesta de la BD a la API
+        mapped_logs = []
+        reverse_op_map = {"I": "INSERT", "U": "UPDATE", "D": "DELETE"}
+        
+        for row in logs:
+            mapped_logs.append({
+                "id": str(row.get("id", row.get("log_id"))),
+                "timestamp": row.get("fecha_hora"),
+                "engine": engine,
+                "table": row.get("tabla_nombre"),
+                "operation": reverse_op_map.get(row.get("operacion"), row.get("operacion")),
+                "old_data": row.get("valores_old"),
+                "new_data": row.get("valores_new"),
+                "user": row.get("usuario_bd")
+            })
+            
+        return {"success": True, "count": len(mapped_logs), "logs": mapped_logs}
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 

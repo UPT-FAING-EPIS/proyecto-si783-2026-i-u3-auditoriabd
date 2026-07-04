@@ -56,8 +56,9 @@ Si el usuario proporciona una URL de conexión de MongoDB (ej. `mongodb+srv://..
 ### 2. Consultar logs de auditoría
 
 Usa una petición HTTP GET a `/api/v1/logs`. Parámetros útiles: `engine`, `operation` (DELETE, INSERT, UPDATE), `limit`.
+**Nota:** Como la API es stateless, DEBES enviar también los datos de conexión como parámetros en la query (`host`, `user`, `password`, `database`). Si es MongoDB con URI, envía la URI en el parámetro `host`.
 
-Ejemplo: `/api/v1/logs?engine=postgresql&operation=DELETE&limit=10`
+Ejemplo: `/api/v1/logs?engine=mongodb&operation=DELETE&host=cluster0.ejemplo.mongodb.net&user=usuario&password=password&database=mi_bd&limit=10`
 
 La respuesta tendrá un formato similar a:
 
