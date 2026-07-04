@@ -69,10 +69,10 @@ jobs:
 
       - name: Generate Dashboard Index HTML
         run: |
-          # Obtener el nombre del repositorio (usuario/repo) para los badges
-          REPO_NAME=${{ github.repository }}
+          # Crear el archivo .nojekyll para evitar que GitHub Pages procese con Jekyll y priorice index.html
+          touch public/.nojekyll
           
-          cat << EOF > public/index.html
+          cat << 'EOF' > public/index.html
           <!DOCTYPE html>
           <html lang="es">
           <head>
@@ -95,22 +95,22 @@ jobs:
           <body>
             <header>
               <h1>Resultados de Pruebas y GitHub Actions</h1>
-              <p>Repositorio: \$REPO_NAME</p>
+              <p>Repositorio: ${{ github.repository }}</p>
             </header>
             <div class="container">
               <h2>Estado de los Workflows</h2>
               <div class="badges">
                 <div class="badge-item">
                   <span>Análisis Estático (SonarCloud, Semgrep, Snyk)</span>
-                  <img src="https://github.com/\$REPO_NAME/actions/workflows/static-analysis.yml/badge.svg" alt="Static Analysis">
+                  <img src="https://github.com/${{ github.repository }}/actions/workflows/static-analysis.yml/badge.svg" alt="Static Analysis">
                 </div>
                 <div class="badge-item">
                   <span>Pruebas (Unitarias, Integración, UI, BDD)</span>
-                  <img src="https://github.com/\$REPO_NAME/actions/workflows/testing.yml/badge.svg" alt="Testing">
+                  <img src="https://github.com/${{ github.repository }}/actions/workflows/testing.yml/badge.svg" alt="Testing">
                 </div>
                 <div class="badge-item">
                   <span>Versionamiento y Release</span>
-                  <img src="https://github.com/\$REPO_NAME/actions/workflows/versioning.yml/badge.svg" alt="Versioning">
+                  <img src="https://github.com/${{ github.repository }}/actions/workflows/versioning.yml/badge.svg" alt="Versioning">
                 </div>
               </div>
 
@@ -132,4 +132,3 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./public
-          keep_files: true
