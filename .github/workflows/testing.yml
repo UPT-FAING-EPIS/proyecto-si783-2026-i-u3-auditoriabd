@@ -32,7 +32,7 @@ jobs:
         run: |
           echo "Ejecutando pruebas unitarias..."
           if [ -d "tests/unit" ]; then
-            pytest tests/unit/ --cov=./
+            PYTHONPATH=. pytest tests/unit/ --cov=app
           else
             echo "No se encontró el directorio tests/unit. Asegúrate de crear tus pruebas unitarias ahí."
           fi
@@ -41,7 +41,7 @@ jobs:
         run: |
           echo "Ejecutando pruebas de integración..."
           if [ -d "tests/integration" ]; then
-            pytest tests/integration/
+            PYTHONPATH=. pytest tests/integration/
           else
             echo "No se encontró el directorio tests/integration. Asegúrate de crear tus pruebas de integración ahí."
           fi
@@ -61,7 +61,7 @@ jobs:
         run: |
           echo "Ejecutando pruebas de interfaz..."
           if [ -d "tests/interface" ]; then
-            pytest tests/interface/
+            PYTHONPATH=. pytest tests/interface/
           else
             echo "No se encontró el directorio tests/interface. Asegúrate de crear tus pruebas de interfaz ahí usando Playwright."
           fi
@@ -70,7 +70,7 @@ jobs:
         run: |
           echo "Ejecutando pruebas BDD..."
           if [ -d "features" ]; then
-            behave
+            PYTHONPATH=. behave
           else
             echo "No se encontró el directorio features. Asegúrate de crear tus pruebas BDD (archivos .feature) ahí."
           fi

@@ -35,7 +35,7 @@ jobs:
         run: |
           mkdir -p public/coverage-report
           if [ -d "tests/unit" ]; then
-            pytest tests/unit/ --cov=app --cov-report=html:public/coverage-report --html=public/unit-tests.html --self-contained-html || true
+            PYTHONPATH=. pytest tests/unit/ --cov=app --cov-report=html:public/coverage-report --html=public/unit-tests.html --self-contained-html || true
           else
             echo "<p>No unit tests found.</p>" > public/unit-tests.html
             echo "<p>No coverage generated because there are no tests.</p>" > public/coverage-report/index.html
@@ -49,7 +49,7 @@ jobs:
       - name: Run Integration Tests and Generate HTML
         run: |
           if [ -d "tests/integration" ]; then
-            pytest tests/integration/ --html=public/integration-tests.html --self-contained-html
+            PYTHONPATH=. pytest tests/integration/ --html=public/integration-tests.html --self-contained-html
           else
             echo "<p>No integration tests found.</p>" > public/integration-tests.html
           fi
@@ -58,7 +58,7 @@ jobs:
       - name: Run Interface Tests and Generate HTML
         run: |
           if [ -d "tests/interface" ]; then
-            pytest tests/interface/ --html=public/interface-tests.html --self-contained-html
+            PYTHONPATH=. pytest tests/interface/ --html=public/interface-tests.html --self-contained-html
           else
             echo "<p>No interface tests found.</p>" > public/interface-tests.html
           fi
@@ -67,7 +67,7 @@ jobs:
       - name: Run BDD Tests and Generate HTML
         run: |
           if [ -d "features" ]; then
-            behave -f behave_html_formatter:HTMLFormatter -o public/bdd-tests.html || true
+            PYTHONPATH=. behave -f behave_html_formatter:HTMLFormatter -o public/bdd-tests.html || true
           else
             echo "<p>No BDD tests found.</p>" > public/bdd-tests.html
           fi
