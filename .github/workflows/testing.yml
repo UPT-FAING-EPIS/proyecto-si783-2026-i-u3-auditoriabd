@@ -49,11 +49,10 @@ jobs:
       - name: Pruebas de Mutantes (Mutmut)
         run: |
           echo "Ejecutando pruebas de mutantes..."
-          # mutmut ejecutará si detecta configuraciones o asume los defaults en ./tests
           if [ -d "tests" ]; then
-            echo "Aquí se ejecutaría mutmut. Para evitar que el workflow tarde horas,"
-            echo "configura 'mutmut run' según los archivos críticos que desees probar."
-            # mutmut run
+            # Se ejecuta mutmut limitando a app.py para que no tome demasiado tiempo.
+            # Se usa || true para que el workflow no falle si hay mutantes sobrevivientes.
+            mutmut run --paths-to-mutate app.py || true
           else
              echo "No se encontró el directorio tests para correr mutmut."
           fi

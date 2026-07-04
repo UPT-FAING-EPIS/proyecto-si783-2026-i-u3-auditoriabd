@@ -33,10 +33,16 @@ jobs:
 
       - name: Run Unit Tests and Generate HTML
         run: |
+          mkdir -p public/coverage
           if [ -d "tests/unit" ]; then
-            pytest tests/unit/ --cov=./ --cov-report=html:public/coverage --html=public/unit-tests.html --self-contained-html
+            pytest tests/unit/ --cov=./ --cov-report=html:public/coverage --html=public/unit-tests.html --self-contained-html || true
           else
             echo "<p>No unit tests found.</p>" > public/unit-tests.html
+            echo "<p>No coverage generated because there are no tests.</p>" > public/coverage/index.html
+          fi
+          # Fallback if pytest failed to create the coverage index
+          if [ ! -f "public/coverage/index.html" ]; then
+            echo "<p>Coverage report could not be generated (tests may have failed before coverage was calculated).</p>" > public/coverage/index.html
           fi
         continue-on-error: true
 
@@ -61,9 +67,13 @@ jobs:
       - name: Run BDD Tests and Generate HTML
         run: |
           if [ -d "features" ]; then
-            behave -f html -o public/bdd-tests.html
+            behave -f behave_html_formatter:HTMLFormatter -o public/bdd-tests.html || true
           else
             echo "<p>No BDD tests found.</p>" > public/bdd-tests.html
+          fi
+          # Fallback si behave falla y no genera el archivo
+          if [ ! -f "public/bdd-tests.html" ]; then
+            echo "<p>No BDD tests report generated. Behave may have encountered an error.</p>" > public/bdd-tests.html
           fi
         continue-on-error: true
 
