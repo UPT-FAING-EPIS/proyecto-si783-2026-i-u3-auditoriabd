@@ -1,55 +1,81 @@
-# Presentación: Sistema de Auditoría de Bases de Datos
+---
+marp: true
+theme: default
+class: invert
+paginate: true
+backgroundColor: #0d1117
+color: #c9d1d9
+---
 
-Bienvenidos a la presentación oficial del proyecto **bd-auditoria**. A continuación, se detallan las características principales, el modelo de despliegue de nuestras integraciones y la interoperabilidad con otros sistemas de la clase mediante APIs.
+#  Sistema de Auditoría de Bases de Datos
+**Ecosistema, Documentación e Integraciones**
 
-````carousel
-# 🛡️ Sistema de Auditoría y Documentación
-> [!NOTE]
-> Una plataforma centralizada para administrar y auditar eventos de bases de datos de diferentes clientes, contando con su **Documentación oficial y completa alojada en Github**.
+---
 
-**Características Principales:**
-- **Acceso y Registro (SaaS):** Gestión segura de usuarios y roles.
-- **Gestor de Conexión:** Conexión a PostgreSQL, MySQL, SQLite y MongoDB para instalar el núcleo de auditoría.
-- **Monitoreo en Vivo:** Seguimiento de operaciones (Insert, Update, Delete) en tiempo real con capacidad de rollback.
-- **Cargador de CSV:** Análisis de reportes históricos de auditoría.
-- **Documentación Completa:** Todo el código fuente, la guía de despliegue, guías de integración y los flujos se encuentran versionados y bien explicados en el repositorio de Github.
+#  Documentación Oficial en GitHub
 
-<!-- slide -->
-# ⚙️ Integración 1: Skill Publicada
+Todo nuestro proyecto no es solo código; es un **ecosistema documentado**.
 
-La funcionalidad core ha sido paquetizada y distribuida a través de una **Agent Skill**. Esto permite a otros asistentes automatizados consumir las herramientas de auditoría fácilmente.
+- **Centralización:** Un único repositorio como fuente de la verdad.
+- **Transparencia:** Código fuente, guías de despliegue y manuales de integración disponibles y versionados.
+- **OpenAPI / Swagger:** Documentación interactiva de nuestra API para que otros equipos puedan consumirla sin fricciones.
 
-> [!TIP]
-> Puedes revisar la documentación técnica de nuestra skill en el repositorio: [SKILL.md](file:///c:/PY_BDII_CALIDAD/bd-auditoria-test/.agents/skills/bd-auditoria/SKILL.md)
+---
 
-**Capacidades de la Skill:**
-- Conexión dinámica a bases de datos relacionales y NoSQL.
-- Inyección de Triggers de auditoría.
-- Extracción de métricas de uso y operaciones.
+#  El Ecosistema de Integraciones
 
-<!-- slide -->
-# 🧩 Integración 2: Extensión de VS Code
+Nuestro Panel Web (Streamlit) es solo el núcleo. Hemos extendido nuestras herramientas para integrarnos en el flujo de trabajo real de los desarrolladores:
 
-Para facilitar aún más el trabajo de los desarrolladores y DBAs que consumen nuestros servicios, hemos publicado una extensión oficial para VS Code.
+1. **Skill / API REST Pública** (Desplegada en la nube)
+2. **Extensión Oficial para VS Code** (Publicada en el Marketplace)
+3. **GitHub Action** (Automatización CI/CD para Rollbacks)
 
-> [!IMPORTANT]
-> La extensión oficial ya se encuentra publicada y disponible para su uso directo dentro del editor.
+---
 
-![VS Code Extension](C:/Users/Mi Equipo/.gemini/antigravity-ide/brain/1d53716c-f38b-40ba-ac21-f238ca03938d/extension.png)
+#  Integración 1: Skill (API REST)
 
-<!-- slide -->
-# 🔌 Integraciones 3: Interoperabilidad con APIs
+Hemos extraído la lógica de conexión y auditoría en una API independiente alojada en **Railway** usando *FastAPI*.
 
-Para garantizar que las bases de datos auditadas cumplan con los más altos estándares de calidad, **hemos integrado nuestro sistema con las APIs desarrolladas por otros grupos**:
+- **Interoperabilidad:** Permite que agentes automatizados o aplicaciones de otros grupos se conecten a nuestra lógica.
+- **Endpoints Clave:** `/api/v1/connections`, `/api/v1/logs`, `/api/v1/rollback`.
+- **Despliegue 24/7:** Totalmente pública, escalable y documentada.
 
-> [!NOTE]
-> La comunicación entre los proyectos se realiza de forma limpia mediante servicios REST (APIs), enriqueciendo las capacidades de nuestro sistema base.
+---
 
-1. **Validador de Sintaxis (API):**
-   - **Desarrollado por:** Gian Franco Arocutipa y Cristian Soto.
-   - **Uso Integrado:** Validación de las consultas SQL, reglas y scripts generados antes de inyectar triggers o ejecutar operaciones de rollback en la auditoría.
+#  Integración 2: Extensión de VS Code
 
-2. **Validador de Normalización (API):**
-   - **Desarrollado por:** Fabrizio Perez y Manuel Dongo.
-   - **Uso Integrado:** Análisis del esquema de las bases de datos que son conectadas a nuestro sistema para asegurar que cumplen con las formas normales (1NF, 2NF, 3NF) antes de ser auditadas.
-````
+Para facilitar el trabajo de los DBAs, publicamos una **Extensión en el Marketplace de VS Code**.
+
+- **Acceso Directo:** Comando `BD Auditoria: Abrir Panel`.
+- **Flujo Ininterrumpido:** Permite revisar la seguridad, ver logs y auditar bases de datos (Postgres, Mongo, MySQL, SQLite) sin salir del editor de código.
+- **Integración Nativa:** Se acopla perfectamente al entorno de desarrollo diario.
+
+---
+
+#  Integración 3: GitHub Action de Rollback
+
+**Automatización de Desastres en Tiempo Real.**
+
+- Si un usuario (o alguien de otro grupo) comete un error grave (ej. un `DELETE` accidental), no necesita escribir código para arreglarlo.
+- **El Flujo:** Ejecutan nuestro Action en GitHub -> ingresan el `log_id` -> el Action consume nuestra API en Railway.
+- **La Magia:** Nuestra API genera el SQL inverso (`INSERT`, `UPDATE`) y el Action **crea un Pull Request automáticamente** en su repositorio.
+
+---
+
+#  Sinergia con otros Proyectos (Validadores)
+
+Nuestra API de Auditoría es el puente perfecto para el resto del aula:
+
+- **Validador de Sintaxis SQL y NoSQL:** Pueden enviarnos las consultas que ellos validan para que nosotros registremos el impacto real en las bases de datos.
+- **Validador de Normalización:** Podemos registrar las alteraciones estructurales y migraciones cuando apliquen sus scripts en bases de datos de producción.
+
+---
+
+#  Conclusión
+
+Hemos construido más que un simple panel web: hemos entregado un **Producto de Software Completo**.
+
+✅ Documentado.
+✅ Escalable (API separada).
+✅ Integrado al código (VS Code y GitHub Actions).
+
