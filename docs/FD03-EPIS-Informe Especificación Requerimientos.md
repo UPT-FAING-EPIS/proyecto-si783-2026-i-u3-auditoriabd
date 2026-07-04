@@ -217,7 +217,8 @@ El equipo desarrolla una solución centralizada de auditoría. Mediante un panel
 <img width="1342" height="449" alt="image" src="https://github.com/user-attachments/assets/fadb3f78-41c6-42e3-b8c8-086a24547f97" />
 
 ### C. Modelo Lógico: Diagrama de Clases
-<img width="1843" height="811" alt="image" src="https://github.com/user-attachments/assets/2f89434f-69f0-478b-96c7-0f5d86aed4d2" />
+<img width="1418" height="894" alt="image" src="https://github.com/user-attachments/assets/e35dcc42-4f91-4081-b9dc-a5379db3ad54" />
+
 
 
 ---
